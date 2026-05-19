@@ -142,7 +142,7 @@
 <body class="theme-normal">
 
     <div class="top-bar">
-        <div id="fps-counter">FPS: 60</div>
+        <div id="fps-counter">FPS: 10</div>
         <select id="graphics-settings" onchange="changeTheme()">
             <option value="potato">Potato (recommended for the intel pentium)</option>
             <option value="low">Low</option>
@@ -154,9 +154,10 @@
     <div id="bsod">
         <h2>FATAL ERROR</h2>
         <p>A fatal exception 0E has occurred.</p>
-        <p>You crashed because of your potato Samsung Galaxy A26 and low FPS.</p>
+        <p>You crashed because of your bad phone and low FPS.</p>
         <p>Graphics were set too high for this hardware.</p>
-        <p>* Press F5 to restart your device.</p>
+        <p>* Press F5 to restart your device. 
+             or refresh the website </p>
     </div>
 
     <div class="calculator" id="calc-body">
@@ -175,143 +176,4 @@
         <button class="btn-dark-gray" onclick="handlePress('4')">4</button>
         <button class="btn-dark-gray" onclick="handlePress('5')">5</button>
         <button class="btn-dark-gray" onclick="handlePress('6')">6</button>
-        <button class="btn-orange" onclick="handlePress('-')">&minus;</button>
-
-        <button class="btn-dark-gray" onclick="handlePress('1')">1</button>
-        <button class="btn-dark-gray" onclick="handlePress('2')">2</button>
-        <button class="btn-dark-gray" onclick="handlePress('3')">3</button>
-        <button class="btn-orange" onclick="handlePress('+')">+</button>
-
-        <button class="btn-dark-gray btn-zero" onclick="handlePress('0')">0</button>
-        <button class="btn-dark-gray" onclick="handlePress('.')">.</button>
-        <button class="btn-orange" onclick="handlePress('solve')">=</button>
-    </div>
-
-    <script>
-        let currentInput = "";
-        let isSassyMode = false;
-        let highGraphicsClicks = 0;
-        const display = document.getElementById('display');
-
-        // --- Theme & FPS Logic ---
-        function changeTheme() {
-            const theme = document.getElementById('graphics-settings').value;
-            document.body.className = `theme-${theme}`;
-            
-            // Reset click counter if they change themes
-            highGraphicsClicks = 0; 
-            
-            // Reset FPS display color
-            const fpsCounter = document.getElementById('fps-counter');
-            if (theme === 'high') fpsCounter.style.color = '#ff0000';
-            else if (theme === 'potato') fpsCounter.style.color = '#ffaa00';
-            else fpsCounter.style.color = '#0ff';
-        }
-
-        function updateFPS() {
-            const theme = document.getElementById('graphics-settings').value;
-            let fps = 60;
-            
-            if (theme === 'potato') {
-                fps = Math.floor(Math.random() * 3) + 8; // Random between 8 and 10
-            } else if (theme === 'low') {
-                fps = Math.floor(Math.random() * 11) + 20; // Random between 20 and 30
-            } else if (theme === 'normal') {
-                fps = 60; // Stable 60
-            } else if (theme === 'high') {
-                fps = Math.floor(Math.random() * 3); // Lagging between 0 and 2
-            }
-
-            document.getElementById('fps-counter').innerText = `FPS: ${fps}`;
-        }
-        
-        // Run the FPS counter every half second
-        setInterval(updateFPS, 500);
-
-
-        // --- Button Press & Lag Logic ---
-        function handlePress(val) {
-            const theme = document.getElementById('graphics-settings').value;
-            
-            if (theme === 'high') {
-                highGraphicsClicks++;
-                
-                // If they click 5 times on High graphics, crash the system
-                if (highGraphicsClicks >= 5) {
-                    crashSystem();
-                    return;
-                }
-
-                // Simulate intense lag on High graphics (1.5 second delay)
-                setTimeout(() => processInput(val), 1500);
-            } else {
-                // Normal instant response for other themes
-                processInput(val);
-            }
-        }
-
-        function crashSystem() {
-            alert("u crashed bc of ur potato Samsung Galaxy A26 and low fps");
-            document.getElementById('calc-body').style.display = 'none';
-            document.querySelector('.top-bar').style.display = 'none';
-            document.getElementById('bsod').style.display = 'block';
-        }
-
-
-        // --- Calculator Core Logic ---
-        function processInput(val) {
-            if (val === 'clear') {
-                display.innerText = "0";
-                currentInput = "";
-                display.classList.remove('sassy-mode');
-                isSassyMode = false;
-            } else if (val === 'solve') {
-                solve();
-            } else {
-                if (isSassyMode) {
-                    display.innerText = "0";
-                    currentInput = "";
-                    display.classList.remove('sassy-mode');
-                    isSassyMode = false;
-                }
-                
-                if (display.innerText === "0") {
-                    display.innerText = val;
-                } else {
-                    display.innerText += val;
-                }
-                currentInput += val;
-            }
-        }
-
-        function solve() {
-            let cleanInput = currentInput.replace(/\s+/g, '');
-            const easyMath = ['1+1', '2+2', '1+2', '2+1', '10+10', '5+5'];
-            const sassyResponses = [
-                "IDK bro, use your fingers",
-                "Seriously? 🤦‍♂️",
-                "im too tired for this",
-                "google it"
-            ];
-
-            if (easyMath.includes(cleanInput)) {
-                isSassyMode = true;
-                display.classList.add('sassy-mode');
-                let randomIndex = Math.floor(Math.random() * sassyResponses.length);
-                display.innerText = sassyResponses[randomIndex];
-            } else {
-                try {
-                    display.classList.remove('sassy-mode');
-                    let answer = eval(cleanInput); 
-                    display.innerText = answer;
-                    currentInput = answer.toString(); 
-                } catch (error) {
-                    isSassyMode = true;
-                    display.classList.add('sassy-mode');
-                    display.innerText = "that's not even math";
-                }
-            }
-        }
-    </script>
-</body>
-</html>
+        <button class="btn-orange" onclick="handlePress('-')
