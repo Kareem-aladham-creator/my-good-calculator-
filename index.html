@@ -5,192 +5,307 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculator</title>
     <style>
+        /* --- GLOBAL STYLES --- */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #000; /* True black like iPhone */
-            margin: 0;
-            user-select: none; /* Prevents text selection while tapping */
+            user-select: none;
+            transition: background-color 0.3s;
         }
 
+        /* Top Bar for FPS and Settings */
+        .top-bar {
+            position: absolute;
+            top: 20px;
+            display: flex;
+            justify-content: space-between;
+            width: 320px;
+            align-items: center;
+            z-index: 100;
+        }
+
+        #fps-counter {
+            font-weight: bold;
+            font-size: 18px;
+            color: #0ff;
+            background: rgba(0,0,0,0.7);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+
+        select {
+            padding: 5px;
+            background: #333;
+            color: white;
+            border: 1px solid #555;
+            border-radius: 5px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* Base Calculator Grid */
         .calculator {
             width: 320px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            padding: 12px;
+            transition: all 0.3s;
         }
 
         #display {
             grid-column: 1 / -1;
-            background-color: black;
-            color: white;
-            font-size: 70px;
-            font-weight: 300;
             text-align: right;
-            padding: 20px 10px;
             overflow-x: auto;
-            min-height: 80px;
             white-space: nowrap;
-        }
-
-        /* Styles for when the sass is active */
-        #display.sassy-mode {
-            color: #ff4757; /* Make the sass red */
-            font-size: 32px; /* Small font so the sentence fits */
-            font-weight: 500;
-            padding-top: 50px; /* Adjust spacing */
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
         }
 
         button {
-            aspect-ratio: 1; /* Makes buttons perfectly square */
-            border-radius: 50%; /* Makes buttons perfectly circular */
-            border: none;
-            font-size: 32px;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: opacity 0.1s;
+            border: none;
         }
 
-        button:active {
-            opacity: 0.7; /* Adds a little "press" effect */
-        }
-
-        /* Grid specific placement for the wide zero button */
         .btn-zero {
             grid-column: span 2;
-            aspect-ratio: auto; /* Overrides the 1:1 ratio */
-            border-radius: 40px; /* Pill shape for zero */
-            justify-content: flex-start;
-            padding-left: 30px;
         }
 
-        /* --- BUTTON COLORS --- */
+        /* ---------------------------------------------------
+           THEME 1: NORMAL (iPhone Style - Default)
+           --------------------------------------------------- */
+        body.theme-normal { background-color: #000; font-family: -apple-system, sans-serif; }
+        body.theme-normal .calculator { gap: 12px; padding: 12px; }
+        body.theme-normal #display { background: #000; color: #fff; font-size: 70px; font-weight: 300; min-height: 80px; padding: 20px 10px; }
+        body.theme-normal #display.sassy-mode { color: #ff4757; font-size: 32px; padding-bottom: 30px;}
+        body.theme-normal button { aspect-ratio: 1; border-radius: 50%; font-size: 32px; transition: opacity 0.1s; }
+        body.theme-normal button:active { opacity: 0.7; }
+        body.theme-normal .btn-zero { aspect-ratio: auto; border-radius: 40px; justify-content: flex-start; padding-left: 30px; }
+        body.theme-normal .btn-light-gray { background-color: #a5a5a5; color: #000; }
+        body.theme-normal .btn-dark-gray { background-color: #333; color: #fff; }
+        body.theme-normal .btn-orange { background-color: #ff9f0a; color: #fff; font-size: 38px; }
 
-        /* Light Gray Buttons (AC, +/-, %) */
-        .btn-light-gray {
-            background-color: #a5a5a5;
-            color: #000;
-        }
+        /* ---------------------------------------------------
+           THEME 2: LOW (The Original Red/Grey Box)
+           --------------------------------------------------- */
+        body.theme-low { background-color: #222; font-family: Arial, sans-serif; }
+        body.theme-low .calculator { background-color: #333; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); gap: 10px; }
+        body.theme-low #display { background-color: #222; color: #1dd1a1; font-size: 40px; font-weight: bold; min-height: 60px; padding: 10px; border-radius: 5px; }
+        body.theme-low #display.sassy-mode { color: #ff4757; font-size: 24px; }
+        body.theme-low button { aspect-ratio: auto; min-height: 60px; border-radius: 5px; background-color: #ff4757; color: white; font-size: 24px; font-weight: bold; }
+        body.theme-low button:hover { background-color: #ff6b81; }
 
-        /* Dark Gray Buttons (Numbers, decimal) */
-        .btn-dark-gray {
-            background-color: #333;
-            color: #fff;
-        }
+        /* ---------------------------------------------------
+           THEME 3: POTATO (Minecraft Theme)
+           --------------------------------------------------- */
+        body.theme-potato { background-color: #55aa55; font-family: 'Courier New', Courier, monospace; font-weight: bold; }
+        body.theme-potato .calculator { background-color: #8b6d4d; padding: 15px; border: 6px solid #3e2815; gap: 5px; }
+        body.theme-potato #display { background-color: #c6c6c6; border: 4px inset #777; color: #000; font-size: 35px; min-height: 60px; padding: 10px; box-sizing: border-box;}
+        body.theme-potato #display.sassy-mode { color: #aa0000; font-size: 20px; }
+        body.theme-potato button { aspect-ratio: auto; min-height: 55px; background-color: #9d9d9d; border: 4px inset #fff; color: black; font-size: 20px; }
+        body.theme-potato button:active { border-style: outset; background-color: #888; }
+        body.theme-potato .btn-orange { background-color: #ffaa00; }
 
-        /* Orange Buttons (Operators) */
-        .btn-orange {
-            background-color: #ff9f0a;
-            color: #fff;
-            font-size: 38px; /* Slightly larger icons for operators */
+        /* ---------------------------------------------------
+           THEME 4: HIGH (Over-the-top Black RTX Theme)
+           --------------------------------------------------- */
+        body.theme-high { background-color: #050505; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body.theme-high .calculator { background: linear-gradient(145deg, #1a1a1a, #000); padding: 25px; border-radius: 20px; box-shadow: 0 0 40px rgba(0, 255, 255, 0.1), inset 0 0 20px rgba(255, 255, 255, 0.02); border: 1px solid #333; gap: 15px; }
+        body.theme-high #display { background: #000; color: #0ff; text-shadow: 0 0 10px #0ff; border: 1px solid #333; border-radius: 10px; font-size: 50px; min-height: 70px; padding: 15px; box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.1); }
+        body.theme-high #display.sassy-mode { color: #f0f; text-shadow: 0 0 10px #f0f; font-size: 26px; }
+        body.theme-high button { aspect-ratio: auto; min-height: 65px; background: #0a0a0a; border: 1px solid #333; border-radius: 12px; color: #0ff; font-size: 26px; box-shadow: 0 0 10px rgba(0, 255, 255, 0.05); transition: all 0.3s; }
+        body.theme-high button:hover { box-shadow: 0 0 20px rgba(0, 255, 255, 0.4); border-color: #0ff; }
+        body.theme-high .btn-orange { color: #f0f; text-shadow: 0 0 5px #f0f; border-color: #f0f; }
+        body.theme-high .btn-orange:hover { box-shadow: 0 0 20px rgba(255, 0, 255, 0.4); }
+
+        /* Crash Screen */
+        #bsod {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #0000aa;
+            color: white;
+            font-family: 'Courier New', monospace;
+            padding: 50px;
+            box-sizing: border-box;
+            z-index: 1000;
         }
     </style>
 </head>
-<body>
+<body class="theme-normal">
 
-    <div class="calculator">
+    <div class="top-bar">
+        <div id="fps-counter">FPS: 60</div>
+        <select id="graphics-settings" onchange="changeTheme()">
+            <option value="potato">Potato (recommended for the intel pentium)</option>
+            <option value="low">Low</option>
+            <option value="normal" selected>Normal</option>
+            <option value="high">High</option>
+        </select>
+    </div>
+
+    <div id="bsod">
+        <h2>FATAL ERROR</h2>
+        <p>A fatal exception 0E has occurred.</p>
+        <p>You crashed because of your potato Samsung Galaxy A26 and low FPS.</p>
+        <p>Graphics were set too high for this hardware.</p>
+        <p>* Press F5 to restart your device.</p>
+    </div>
+
+    <div class="calculator" id="calc-body">
         <div id="display">0</div>
 
-        <button class="btn-light-gray" onclick="clearDisplay()">AC</button>
+        <button class="btn-light-gray" onclick="handlePress('clear')">AC</button>
         <button class="btn-light-gray">+/-</button>
         <button class="btn-light-gray">%</button>
-        <button class="btn-orange" onclick="input('/')">&divide;</button>
+        <button class="btn-orange" onclick="handlePress('/')">&divide;</button>
 
-        <button class="btn-dark-gray" onclick="input('7')">7</button>
-        <button class="btn-dark-gray" onclick="input('8')">8</button>
-        <button class="btn-dark-gray" onclick="input('9')">9</button>
-        <button class="btn-orange" onclick="input('*')">&times;</button>
+        <button class="btn-dark-gray" onclick="handlePress('7')">7</button>
+        <button class="btn-dark-gray" onclick="handlePress('8')">8</button>
+        <button class="btn-dark-gray" onclick="handlePress('9')">9</button>
+        <button class="btn-orange" onclick="handlePress('*')">&times;</button>
 
-        <button class="btn-dark-gray" onclick="input('4')">4</button>
-        <button class="btn-dark-gray" onclick="input('5')">5</button>
-        <button class="btn-dark-gray" onclick="input('6')">6</button>
-        <button class="btn-orange" onclick="input('-')">&minus;</button>
+        <button class="btn-dark-gray" onclick="handlePress('4')">4</button>
+        <button class="btn-dark-gray" onclick="handlePress('5')">5</button>
+        <button class="btn-dark-gray" onclick="handlePress('6')">6</button>
+        <button class="btn-orange" onclick="handlePress('-')">&minus;</button>
 
-        <button class="btn-dark-gray" onclick="input('1')">1</button>
-        <button class="btn-dark-gray" onclick="input('2')">2</button>
-        <button class="btn-dark-gray" onclick="input('3')">3</button>
-        <button class="btn-orange" onclick="input('+')">+</button>
+        <button class="btn-dark-gray" onclick="handlePress('1')">1</button>
+        <button class="btn-dark-gray" onclick="handlePress('2')">2</button>
+        <button class="btn-dark-gray" onclick="handlePress('3')">3</button>
+        <button class="btn-orange" onclick="handlePress('+')">+</button>
 
-        <button class="btn-dark-gray btn-zero" onclick="input('0')">0</button>
-        <button class="btn-dark-gray" onclick="input('.')">.</button>
-        <button class="btn-orange" onclick="solve()">=</button>
+        <button class="btn-dark-gray btn-zero" onclick="handlePress('0')">0</button>
+        <button class="btn-dark-gray" onclick="handlePress('.')">.</button>
+        <button class="btn-orange" onclick="handlePress('solve')">=</button>
     </div>
 
     <script>
         let currentInput = "";
         let isSassyMode = false;
+        let highGraphicsClicks = 0;
         const display = document.getElementById('display');
 
-        // Functions to make the standard calculator work
-        function input(value) {
-            // If the calculator just trolled you, typing a new number clears the insult
-            if (isSassyMode) {
-                clearDisplay();
-            }
+        // --- Theme & FPS Logic ---
+        function changeTheme() {
+            const theme = document.getElementById('graphics-settings').value;
+            document.body.className = `theme-${theme}`;
             
-            // Basic functional behavior
-            if (display.innerText === "0") {
-                display.innerText = value;
+            // Reset click counter if they change themes
+            highGraphicsClicks = 0; 
+            
+            // Reset FPS display color
+            const fpsCounter = document.getElementById('fps-counter');
+            if (theme === 'high') fpsCounter.style.color = '#ff0000';
+            else if (theme === 'potato') fpsCounter.style.color = '#ffaa00';
+            else fpsCounter.style.color = '#0ff';
+        }
+
+        function updateFPS() {
+            const theme = document.getElementById('graphics-settings').value;
+            let fps = 60;
+            
+            if (theme === 'potato') {
+                fps = Math.floor(Math.random() * 3) + 8; // Random between 8 and 10
+            } else if (theme === 'low') {
+                fps = Math.floor(Math.random() * 11) + 20; // Random between 20 and 30
+            } else if (theme === 'normal') {
+                fps = 60; // Stable 60
+            } else if (theme === 'high') {
+                fps = Math.floor(Math.random() * 3); // Lagging between 0 and 2
+            }
+
+            document.getElementById('fps-counter').innerText = `FPS: ${fps}`;
+        }
+        
+        // Run the FPS counter every half second
+        setInterval(updateFPS, 500);
+
+
+        // --- Button Press & Lag Logic ---
+        function handlePress(val) {
+            const theme = document.getElementById('graphics-settings').value;
+            
+            if (theme === 'high') {
+                highGraphicsClicks++;
+                
+                // If they click 5 times on High graphics, crash the system
+                if (highGraphicsClicks >= 5) {
+                    crashSystem();
+                    return;
+                }
+
+                // Simulate intense lag on High graphics (1.5 second delay)
+                setTimeout(() => processInput(val), 1500);
             } else {
-                display.innerText += value;
+                // Normal instant response for other themes
+                processInput(val);
             }
-            currentInput += value;
         }
 
-        function clearDisplay() {
-            display.innerText = "0";
-            currentInput = "";
-            display.classList.remove('sassy-mode'); // Reset color/size
-            isSassyMode = false;
+        function crashSystem() {
+            alert("u crashed bc of ur potato Samsung Galaxy A26 and low fps");
+            document.getElementById('calc-body').style.display = 'none';
+            document.querySelector('.top-bar').style.display = 'none';
+            document.getElementById('bsod').style.display = 'block';
         }
 
-        // --- The Sass Logic ---
+
+        // --- Calculator Core Logic ---
+        function processInput(val) {
+            if (val === 'clear') {
+                display.innerText = "0";
+                currentInput = "";
+                display.classList.remove('sassy-mode');
+                isSassyMode = false;
+            } else if (val === 'solve') {
+                solve();
+            } else {
+                if (isSassyMode) {
+                    display.innerText = "0";
+                    currentInput = "";
+                    display.classList.remove('sassy-mode');
+                    isSassyMode = false;
+                }
+                
+                if (display.innerText === "0") {
+                    display.innerText = val;
+                } else {
+                    display.innerText += val;
+                }
+                currentInput += val;
+            }
+        }
+
         function solve() {
-            // Remove spaces from the input for consistent checking
             let cleanInput = currentInput.replace(/\s+/g, '');
-
-            // 1. Define "easy" problems that trigger sass
             const easyMath = ['1+1', '2+2', '1+2', '2+1', '10+10', '5+5'];
-            
-            // 2. Define the sassy responses
             const sassyResponses = [
-                "IDK bro,use your fingers!",
-                "Bruh,use your fingers",
-                "Seriously?🤦‍♂️",
+                "IDK bro, use your fingers",
+                "Seriously? 🤦‍♂️",
                 "im too tired for this",
                 "google it"
             ];
 
-            // 3. Check for sass, or solve it properly
             if (easyMath.includes(cleanInput)) {
-                // Enter "Sassy Mode"
                 isSassyMode = true;
-                
-                // Change display style
                 display.classList.add('sassy-mode');
-                
-                // Pick a random insult
                 let randomIndex = Math.floor(Math.random() * sassyResponses.length);
                 display.innerText = sassyResponses[randomIndex];
             } else {
-                // 4. If it's real math, actually solve it
                 try {
-                    // Reset the style in case we were just in sassy mode
                     display.classList.remove('sassy-mode');
-                    
-                    let answer = eval(cleanInput); // Solve the math
-                    
-                    // Show the real answer
+                    let answer = eval(cleanInput); 
                     display.innerText = answer;
-                    currentInput = answer.toString(); // Allow further math with the result
+                    currentInput = answer.toString(); 
                 } catch (error) {
-                    // If they typed something non-mathematical
                     isSassyMode = true;
                     display.classList.add('sassy-mode');
                     display.innerText = "that's not even math";
@@ -198,6 +313,5 @@
             }
         }
     </script>
-
 </body>
 </html>
