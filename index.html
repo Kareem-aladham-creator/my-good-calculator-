@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sassy Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #222;
+            color: white;
+            margin: 0;
+        }
+        .calculator {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            text-align: center;
+            width: 300px;
+        }
+        input {
+            width: 90%;
+            padding: 15px;
+            font-size: 20px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: none;
+            text-align: right;
+        }
+        button {
+            width: 90%;
+            padding: 15px;
+            font-size: 18px;
+            background-color: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #ff6b81;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #1dd1a1;
+            min-height: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator">
+        <h2>Sassy Calc</h2>
+        <!-- Input field for the math -->
+        <input type="text" id="mathInput" placeholder="e.g., 1+1">
+        
+        <!-- Button to trigger calculation -->
+        <button onclick="calculate()">Solve It</button>
+
+        <!-- Where the answer (or insult) goes -->
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function calculate() {
+            // Get what the user typed
+            let rawInput = document.getElementById('mathInput').value;
+            let displayResult = document.getElementById('result');
+            
+            // Remove all spaces so "1 + 1" and "1+1" are treated the same
+            let cleanInput = rawInput.replace(/\s+/g, '');
+
+            // 1. Define the "easy" math problems
+            const easyMath = ['1+1', '2+2', '1+2', '2+1', '10+10', '5+5'];
+            
+            // 2. Define the sassy responses
+            const sassyResponses = [
+                "idk bro", 
+                "bruh, use your fingers", 
+                "im too tired for this", 
+                "seriously?", 
+                "my brother in christ, it's easy",
+                "google it"
+            ];
+
+            // 3. Check if the input is in our list of easy math
+            if (easyMath.includes(cleanInput)) {
+                // Pick a random sassy response
+                let randomIndex = Math.floor(Math.random() * sassyResponses.length);
+                displayResult.innerText = sassyResponses[randomIndex];
+                displayResult.style.color = "#ff4757"; // Make it red for sass
+            } else {
+                // 4. If it's hard math, actually solve it
+                try {
+                    // eval() runs the math string (e.g. "5*5" becomes 25)
+                    let answer = eval(cleanInput); 
+                    
+                    // Prevent it from printing 'undefined' if empty
+                    if (answer === undefined) {
+                        displayResult.innerText = "";
+                    } else {
+                        displayResult.innerText = answer;
+                        displayResult.style.color = "#1dd1a1"; // Make it green for success
+                    }
+                } catch (error) {
+                    // If they type letters or weird symbols
+                    displayResult.innerText = "that's not even math";
+                    displayResult.style.color = "#ff4757";
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>
