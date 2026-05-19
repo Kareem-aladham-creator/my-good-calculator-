@@ -3,117 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sassy Calculator</title>
+    <title>Sassy iPhone Calculator</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #222;
-            color: white;
+            background-color: #000; /* True black like iPhone */
             margin: 0;
+            user-select: none; /* Prevents text selection while tapping */
         }
+
         .calculator {
-            background-color: #333;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            text-align: center;
-            width: 300px;
+            width: 320px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            padding: 12px;
         }
-        input {
-            width: 90%;
-            padding: 15px;
-            font-size: 20px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            border: none;
-            text-align: right;
-        }
-        button {
-            width: 90%;
-            padding: 15px;
-            font-size: 18px;
-            background-color: #ff4757;
+
+        #display {
+            grid-column: 1 / -1;
+            background-color: black;
             color: white;
+            font-size: 70px;
+            font-weight: 300;
+            text-align: right;
+            padding: 20px 10px;
+            overflow-x: auto;
+            min-height: 80px;
+            white-space: nowrap;
+        }
+
+        /* Styles for when the sass is active */
+        #display.sassy-mode {
+            color: #ff4757; /* Make the sass red */
+            font-size: 32px; /* Small font so the sentence fits */
+            font-weight: 500;
+            padding-top: 50px; /* Adjust spacing */
+        }
+
+        button {
+            aspect-ratio: 1; /* Makes buttons perfectly square */
+            border-radius: 50%; /* Makes buttons perfectly circular */
             border: none;
-            border-radius: 5px;
+            font-size: 32px;
             cursor: pointer;
-            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.1s;
         }
-        button:hover {
-            background-color: #ff6b81;
+
+        button:active {
+            opacity: 0.7; /* Adds a little "press" effect */
         }
-        #result {
-            margin-top: 20px;
-            font-size: 24px;
-            font-weight: bold;
-            color: #1dd1a1;
-            min-height: 30px;
+
+        /* Grid specific placement for the wide zero button */
+        .btn-zero {
+            grid-column: span 2;
+            aspect-ratio: auto; /* Overrides the 1:1 ratio */
+            border-radius: 40px; /* Pill shape for zero */
+            justify-content: flex-start;
+            padding-left: 30px;
+        }
+
+        /* --- BUTTON COLORS --- */
+
+        /* Light Gray Buttons (AC, +/-, %) */
+        .btn-light-gray {
+            background-color: #a5a5a5;
+            color: #000;
+        }
+
+        /* Dark Gray Buttons (Numbers, decimal) */
+        .btn-dark-gray {
+            background-color: #333;
+            color: #fff;
+        }
+
+        /* Orange Buttons (Operators) */
+        .btn-orange {
+            background-color: #ff9f0a;
+            color: #fff;
+            font-size: 38px; /* Slightly larger icons for operators */
         }
     </style>
 </head>
 <body>
 
     <div class="calculator">
-        <h2>Sassy Calc</h2>
-        <!-- Input field for the math -->
-        <input type="text" id="mathInput" placeholder="e.g., 1+1">
-        
-        <!-- Button to trigger calculation -->
-        <button onclick="calculate()">Solve It</button>
+        <div id="display">0</div>
 
-        <!-- Where the answer (or insult) goes -->
-        <div id="result"></div>
+        <button class="btn-light-gray" onclick="clearDisplay()">AC</button>
+        <button class="btn-light-gray">+/-</button>
+        <button class="btn-light-gray">%</button>
+        <button class="btn-orange" onclick="input('/')">&divide;</button>
+
+        <button class="btn-dark-gray" onclick="input('7')">7</button>
+        <button class="btn-dark-gray" onclick="input('8')">8</button>
+        <button class="btn-dark-gray" onclick="input('9')">9</button>
+        <button class="btn-orange" onclick="input('*')">&times;</button>
+
+        <button class="btn-dark-gray" onclick="input('4')">4</button>
+        <button class="btn-dark-gray" onclick="input('5')">5</button>
+        <button class="btn-dark-gray" onclick="input('6')">6</button>
+        <button class="btn-orange" onclick="input('-')">&minus;</button>
+
+        <button class="btn-dark-gray" onclick="input('1')">1</button>
+        <button class="btn-dark-gray" onclick="input('2')">2</button>
+        <button class="btn-dark-gray" onclick="input('3')">3</button>
+        <button class="btn-orange" onclick="input('+')">+</button>
+
+        <button class="btn-dark-gray btn-zero" onclick="input('0')">0</button>
+        <button class="btn-dark-gray" onclick="input('.')">.</button>
+        <button class="btn-orange" onclick="solve()">=</button>
     </div>
 
     <script>
-        function calculate() {
-            // Get what the user typed
-            let rawInput = document.getElementById('mathInput').value;
-            let displayResult = document.getElementById('result');
-            
-            // Remove all spaces so "1 + 1" and "1+1" are treated the same
-            let cleanInput = rawInput.replace(/\s+/g, '');
+        let currentInput = "";
+        let isSassyMode = false;
+        const display = document.getElementById('display');
 
-            // 1. Define the "easy" math problems
+        // Functions to make the standard calculator work
+        function input(value) {
+            // If the calculator just trolled you, typing a new number clears the insult
+            if (isSassyMode) {
+                clearDisplay();
+            }
+            
+            // Basic functional behavior
+            if (display.innerText === "0") {
+                display.innerText = value;
+            } else {
+                display.innerText += value;
+            }
+            currentInput += value;
+        }
+
+        function clearDisplay() {
+            display.innerText = "0";
+            currentInput = "";
+            display.classList.remove('sassy-mode'); // Reset color/size
+            isSassyMode = false;
+        }
+
+        // --- The Sass Logic ---
+        function solve() {
+            // Remove spaces from the input for consistent checking
+            let cleanInput = currentInput.replace(/\s+/g, '');
+
+            // 1. Define "easy" problems that trigger sass
             const easyMath = ['1+1', '2+2', '1+2', '2+1', '10+10', '5+5'];
             
             // 2. Define the sassy responses
             const sassyResponses = [
-                "idk bro", 
-                "bruh, use your fingers", 
-                "im too tired for this", 
-                "seriously?", 
-                "my brother in christ, it's easy",
+                "IDK bro, use your fingers!",
+                "Bruh, use your fingers",
+                "Seriously? 🤦‍♂️",
+                "im too tired for this",
                 "google it"
             ];
 
-            // 3. Check if the input is in our list of easy math
+            // 3. Check for sass, or solve it properly
             if (easyMath.includes(cleanInput)) {
-                // Pick a random sassy response
+                // Enter "Sassy Mode"
+                isSassyMode = true;
+                
+                // Change display style
+                display.classList.add('sassy-mode');
+                
+                // Pick a random insult
                 let randomIndex = Math.floor(Math.random() * sassyResponses.length);
-                displayResult.innerText = sassyResponses[randomIndex];
-                displayResult.style.color = "#ff4757"; // Make it red for sass
+                display.innerText = sassyResponses[randomIndex];
             } else {
-                // 4. If it's hard math, actually solve it
+                // 4. If it's real math, actually solve it
                 try {
-                    // eval() runs the math string (e.g. "5*5" becomes 25)
-                    let answer = eval(cleanInput); 
+                    // Reset the style in case we were just in sassy mode
+                    display.classList.remove('sassy-mode');
                     
-                    // Prevent it from printing 'undefined' if empty
-                    if (answer === undefined) {
-                        displayResult.innerText = "";
-                    } else {
-                        displayResult.innerText = answer;
-                        displayResult.style.color = "#1dd1a1"; // Make it green for success
-                    }
+                    let answer = eval(cleanInput); // Solve the math
+                    
+                    // Show the real answer
+                    display.innerText = answer;
+                    currentInput = answer.toString(); // Allow further math with the result
                 } catch (error) {
-                    // If they type letters or weird symbols
-                    displayResult.innerText = "that's not even math";
-                    displayResult.style.color = "#ff4757";
+                    // If they typed something non-mathematical
+                    isSassyMode = true;
+                    display.classList.add('sassy-mode');
+                    display.innerText = "that's not even math";
                 }
             }
         }
