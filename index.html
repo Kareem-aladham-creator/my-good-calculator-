@@ -12,25 +12,24 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             user-select: none;
             transition: background-color 0.3s;
+            background-color: #000; /* Default background */
         }
 
         /* Top Bar for FPS and Settings */
         .top-bar {
-            position: absolute;
-            top: 20px;
             display: flex;
             justify-content: space-between;
             width: 320px;
             align-items: center;
-            z-index: 100;
+            margin-bottom: 30px; /* Gives space so it doesn't squish */
         }
 
         #fps-counter {
             font-weight: bold;
-            font-size: 18px;
+            font-size: 16px;
             color: #0ff;
             background: rgba(0,0,0,0.7);
             padding: 5px 10px;
@@ -46,6 +45,7 @@
             border-radius: 5px;
             outline: none;
             cursor: pointer;
+            max-width: 220px;
         }
 
         /* Base Calculator Grid */
@@ -99,81 +99,3 @@
         body.theme-low .calculator { background-color: #333; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); gap: 10px; }
         body.theme-low #display { background-color: #222; color: #1dd1a1; font-size: 40px; font-weight: bold; min-height: 60px; padding: 10px; border-radius: 5px; }
         body.theme-low #display.sassy-mode { color: #ff4757; font-size: 24px; }
-        body.theme-low button { aspect-ratio: auto; min-height: 60px; border-radius: 5px; background-color: #ff4757; color: white; font-size: 24px; font-weight: bold; }
-        body.theme-low button:hover { background-color: #ff6b81; }
-
-        /* ---------------------------------------------------
-           THEME 3: POTATO (Minecraft Theme)
-           --------------------------------------------------- */
-        body.theme-potato { background-color: #55aa55; font-family: 'Courier New', Courier, monospace; font-weight: bold; }
-        body.theme-potato .calculator { background-color: #8b6d4d; padding: 15px; border: 6px solid #3e2815; gap: 5px; }
-        body.theme-potato #display { background-color: #c6c6c6; border: 4px inset #777; color: #000; font-size: 35px; min-height: 60px; padding: 10px; box-sizing: border-box;}
-        body.theme-potato #display.sassy-mode { color: #aa0000; font-size: 20px; }
-        body.theme-potato button { aspect-ratio: auto; min-height: 55px; background-color: #9d9d9d; border: 4px inset #fff; color: black; font-size: 20px; }
-        body.theme-potato button:active { border-style: outset; background-color: #888; }
-        body.theme-potato .btn-orange { background-color: #ffaa00; }
-
-        /* ---------------------------------------------------
-           THEME 4: HIGH (Over-the-top Black RTX Theme)
-           --------------------------------------------------- */
-        body.theme-high { background-color: #050505; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body.theme-high .calculator { background: linear-gradient(145deg, #1a1a1a, #000); padding: 25px; border-radius: 20px; box-shadow: 0 0 40px rgba(0, 255, 255, 0.1), inset 0 0 20px rgba(255, 255, 255, 0.02); border: 1px solid #333; gap: 15px; }
-        body.theme-high #display { background: #000; color: #0ff; text-shadow: 0 0 10px #0ff; border: 1px solid #333; border-radius: 10px; font-size: 50px; min-height: 70px; padding: 15px; box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.1); }
-        body.theme-high #display.sassy-mode { color: #f0f; text-shadow: 0 0 10px #f0f; font-size: 26px; }
-        body.theme-high button { aspect-ratio: auto; min-height: 65px; background: #0a0a0a; border: 1px solid #333; border-radius: 12px; color: #0ff; font-size: 26px; box-shadow: 0 0 10px rgba(0, 255, 255, 0.05); transition: all 0.3s; }
-        body.theme-high button:hover { box-shadow: 0 0 20px rgba(0, 255, 255, 0.4); border-color: #0ff; }
-        body.theme-high .btn-orange { color: #f0f; text-shadow: 0 0 5px #f0f; border-color: #f0f; }
-        body.theme-high .btn-orange:hover { box-shadow: 0 0 20px rgba(255, 0, 255, 0.4); }
-
-        /* Crash Screen */
-        #bsod {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: #0000aa;
-            color: white;
-            font-family: 'Courier New', monospace;
-            padding: 50px;
-            box-sizing: border-box;
-            z-index: 1000;
-        }
-    </style>
-</head>
-<body class="theme-normal">
-
-    <div class="top-bar">
-        <div id="fps-counter">FPS: 10</div>
-        <select id="graphics-settings" onchange="changeTheme()">
-            <option value="potato">Potato (recommended for the intel pentium)</option>
-            <option value="low">Low</option>
-            <option value="normal" selected>Normal</option>
-            <option value="high">High</option>
-        </select>
-    </div>
-
-    <div id="bsod">
-        <h2>FATAL ERROR</h2>
-        <p>A fatal exception 0E has occurred.</p>
-        <p>You crashed because of your bad phone and low FPS.</p>
-        <p>Graphics were set too high for this hardware.</p>
-        <p>* Press F5 to restart your device. 
-             or refresh the website </p>
-    </div>
-
-    <div class="calculator" id="calc-body">
-        <div id="display">0</div>
-
-        <button class="btn-light-gray" onclick="handlePress('clear')">AC</button>
-        <button class="btn-light-gray">+/-</button>
-        <button class="btn-light-gray">%</button>
-        <button class="btn-orange" onclick="handlePress('/')">&divide;</button>
-
-        <button class="btn-dark-gray" onclick="handlePress('7')">7</button>
-        <button class="btn-dark-gray" onclick="handlePress('8')">8</button>
-        <button class="btn-dark-gray" onclick="handlePress('9')">9</button>
-        <button class="btn-orange" onclick="handlePress('*')">&times;</button>
-
-        <button class="btn-dark-gray" onclick="handlePress('4')">4</button>
-        <button class="btn-dark-gray" onclick="handlePress('5')">5</button>
-        <button class="btn-dark-gray" onclick="handlePress('6')">6</button>
-        <button class="btn-orange" onclick="handlePress('-')
